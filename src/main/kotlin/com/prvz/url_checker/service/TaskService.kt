@@ -9,6 +9,7 @@ import com.prvz.url_checker.repository.CheckTaskHistoryRepository
 import com.prvz.url_checker.repository.CheckTaskRepository
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.net.HttpURLConnection
@@ -116,8 +117,16 @@ open class TaskService(
     fun getTaskInfo(id: String): CheckTask? =
             taskRepository.findById(id).orElse(null)
 
+    fun getLastInfo(): CheckTask? =
+            taskRepository.findTopByOrderByCreateDate()
+
     fun getTaskHistory(id: String, pageable: Pageable): Page<CheckTaskHistory> =
             taskHistoryRepository.findAllByTaskId(id, pageable)
+
+    fun getLastHistory(pageable: Pageable): Page<CheckTaskHistory> =
+            taskRepository.findTopByOrderByCreateDate()
+                    ?.let { taskHistoryRepository.findAllByTaskId(it.id!!, pageable) }
+                    ?: PageImpl<CheckTaskHistory>(emptyList())
 
     private fun runCheckTask(checkTask: CheckTask) {
         checkTask.urls.forEach { url ->

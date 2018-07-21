@@ -48,38 +48,43 @@ open class ApiController(
     @GetMapping("/{id}")
     fun getTask(@PathVariable("id") id: String): ResponseEntity<CheckTaskDto> =
             taskService.getTaskInfo(id)
-                    ?.let {
-                        ok().body(CheckTaskDto(
-                                id = it.id!!,
-                                createDate = it.createDate,
-                                closeDate = it.closeDate,
-                                interval = it.interval,
-                                urls = it.urls))
-                    }
+                    ?.let { ok(toTaskDto(it)) }
                     ?: notFound().build()
 
     @GetMapping("/{id}/history")
     fun getTaskHistory(@PathVariable("id") id: String, pageable: Pageable): Page<CheckTaskHistoryDto> =
-            taskService.getTaskHistory(id, pageable)
-                    .map { entity ->
-                        CheckTaskHistoryDto(
-                                id = entity.id!!,
-                                taskId = entity.taskId,
-                                url = entity.url,
-                                checkDate = entity.checkDate,
-                                result = entity.result
-                        )
-                    }
+            taskService
+                    .getTaskHistory(id, pageable)
+                    .map(this::toTaskHistoryDto)
 
 
     @GetMapping
-    fun test() {
-        val task = CheckTask(
-                createDate = OffsetDateTime.now(),
-                interval = 10,
-                urls = listOf("http://ya.ru", "https://mail.ru"),
-                checkType = CheckType.BY_STATUS)
-        taskService.newTask(task)
-    }
+    fun getLast(): ResponseEntity<CheckTaskDto> =
+            taskService.getLastInfo()
+                    ?.let { ok(toTaskDto(it)) }
+                    ?: notFound().build()
+
+    @GetMapping("/history")
+    fun getLastHistory(pageable: Pageable): Page<CheckTaskHistoryDto> =
+            taskService.getLastHistory(pageable).map(this::toTaskHistoryDto)
+
+
+    private fun toTaskDto(task: CheckTask) =
+            CheckTaskDto(
+                    id = task.id!!,
+                    createDate = task.createDate,
+                    closeDate = task.closeDate,
+                    interval = task.interval,
+                    urls = task.urls)
+
+    private fun toTaskHistoryDto(history: CheckTaskHistory) =
+            CheckTaskHistoryDto(
+                    id = history.id!!,
+                    taskId = history.taskId,
+                    url = history.url,
+                    checkDate = history.checkDate,
+                    result = history.result
+            )
+
 }
 
