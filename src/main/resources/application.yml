@@ -1,0 +1,17 @@
+server:
+  port: 9091
+
+logging.level:
+  com.prvz.*: DEBUG
+  org.hibernate.*: INFO
+  org.springframework.*: INFO
+  org.mongodb.*: INFO
+
+spring:
+  data:
+#    mongodb:
+#      host: localhost
+#      port: 27017
+#      database: db
+#      uri: mongo:/data/db
+

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<configuration packagingData="true">
+    <property name="logFileName" value="url_checker"/>
+    <property name="logFileLocation" value="${user.home}/${logFileName}"/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+        <encoder>
+            <pattern>"%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"</pattern>
+        </encoder>
+    </appender>
+    <appender name="console-err" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern>"%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"</pattern>
+        </encoder>
+    </appender>
+    <appender name="common-log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logFileLocation}/${logFileName}.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <maxFileSize>2MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+            <fileNamePattern>${logFileLocation}/${logFileName}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>"%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"</pattern>
+        </encoder>
+    </appender>
+    <appender name="error-log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logFileLocation}/${logFileName}-error.log</file>
+        <encoder>
+            <pattern>"%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <maxFileSize>2MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+            <fileNamePattern>${logFileLocation}/${logFileName}-error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="console"/>
+        <appender-ref ref="console-err"/>
+        <appender-ref ref="common-log"/>
+        <appender-ref ref="error-log"/>
+    </root>
+</configuration>
