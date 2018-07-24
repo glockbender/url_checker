@@ -1,0 +1,38 @@
+spring:
+  application.name: url_checker
+  profiles:
+    active: dev
+
+server:
+  port: 9091
+
+logging.level:
+  org.springframework.*: INFO
+  org.mongodb.*: INFO
+
+
+---
+spring:
+  profiles: dev
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: db
+      #uri: mongodb://url_checker/db
+
+logging.level:
+  com.prvz.*: INFO
+
+---
+spring:
+  profiles: test
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: test_db
+      #uri: mongodb://url_checker/db
+
+logging.level:
+  com.prvz.*: DEBUG

@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository
 interface CheckTaskRepository :
         MongoRepository<CheckTask, String> {
 
-    fun findTopByOrderByCreateDate(): CheckTask?
+    fun findTopByOrderByCreateDateDesc(): CheckTask?
 }

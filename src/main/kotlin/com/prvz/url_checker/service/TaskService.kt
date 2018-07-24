@@ -38,7 +38,7 @@ open class TaskService(
     private val mainLock = ReentrantLock()
 
     init {
-        val lastTask = taskRepository.findTopByOrderByCreateDate()
+        val lastTask = taskRepository.findTopByOrderByCreateDateDesc()
         if (lastTask != null && lastTask.closeDate == null) {
             runCheckTask(lastTask)
         }
@@ -52,7 +52,7 @@ open class TaskService(
      */
     fun newTask(checkTask: CheckTask): CheckTask {
         mainLock.lock()
-        val lastTask = taskRepository.findTopByOrderByCreateDate()
+        val lastTask = taskRepository.findTopByOrderByCreateDateDesc()
         if (lastTask != null) {
             closeAndCancelTask(lastTask)
         }
@@ -65,7 +65,7 @@ open class TaskService(
     fun stopTask(id: String) {
         mainLock.lock()
         try {
-            taskRepository.findTopByOrderByCreateDate()
+            taskRepository.findTopByOrderByCreateDateDesc()
                     ?.let {
                         if (it.id == id) {
                             if (it.closeDate != null) {
@@ -86,7 +86,7 @@ open class TaskService(
     fun stopLast() {
         mainLock.lock()
         try {
-            taskRepository.findTopByOrderByCreateDate()
+            taskRepository.findTopByOrderByCreateDateDesc()
                     ?.let {
                         if (it.closeDate != null) {
                             throw TaskAlreadyClosedException(it.id!!)
@@ -118,13 +118,13 @@ open class TaskService(
             taskRepository.findById(id).orElse(null)
 
     fun getLastInfo(): CheckTask? =
-            taskRepository.findTopByOrderByCreateDate()
+            taskRepository.findTopByOrderByCreateDateDesc()
 
     fun getTaskHistory(id: String, pageable: Pageable): Page<CheckTaskHistory> =
             taskHistoryRepository.findAllByTaskId(id, pageable)
 
     fun getLastHistory(pageable: Pageable): Page<CheckTaskHistory> =
-            taskRepository.findTopByOrderByCreateDate()
+            taskRepository.findTopByOrderByCreateDateDesc()
                     ?.let { taskHistoryRepository.findAllByTaskId(it.id!!, pageable) }
                     ?: PageImpl<CheckTaskHistory>(emptyList())
 
@@ -168,8 +168,8 @@ open class TaskService(
             try {
                 connection.requestMethod = "GET"
                 connection.connect()
-                connection.connectTimeout = 100
-                connection.readTimeout = 100
+                connection.connectTimeout = 500
+                connection.readTimeout = 500
                 val status = connection.responseCode
                 logger.debug("RESPONSE STATUS: $status URL: $url")
                 ok = status in 200..399
